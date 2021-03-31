@@ -12,19 +12,37 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using ConnectionManagerCS.Protocols;
 
 namespace ConnectionManagerCS
 {
     public class ConnectionManager
     {
+        public delegate void Handler(byte[] messageData);
+
         public ConnectionManager(IConnectionProtocol protocol)
         {
             if (protocol == null) throw new ArgumentNullException();
             Protocol = protocol;
+            Handlers = new Dictionary<byte, List<Queue<Message>>>();
+            Task.Run(() => { ReadAllMessages(); });
         }
 
-        public Message ReadMessage()
+        private void ReadAllMessages()
+        {
+            while(true)
+            {
+                Message msg = ReadMessage();
+                if(Handlers.ContainsKey(msg.JobSpecifier))
+                {
+                    foreach (Queue<Message> messageQueue in Handlers[msg.JobSpecifier])
+                        messageQueue.Enqueue(msg);
+                }
+            }
+        }
+
+        private Message ReadMessage()
         {
             byte[] header = Protocol.ReadBytes(5);
 
@@ -47,11 +65,34 @@ namespace ConnectionManagerCS
             Protocol.WriteBytes(msgBytes);
         }
 
+        public void Subscribe(byte jobSpecifier, Queue<Message> messageQueue)
+        {
+            if (!Handlers.ContainsKey(jobSpecifier))
+                Handlers.Add(jobSpecifier, new List<Queue<Message>>());
+            Handlers[jobSpecifier].Add(messageQueue);
+        }
+
+        public void Unsubscribe(byte jobSpecifier, Queue<Message> messageQueue)
+        {
+            if (!Handlers.ContainsKey(jobSpecifier))
+                throw new ArgumentException("No subscription to the given job specifier exists");
+            if(Handlers[jobSpecifier].Contains(messageQueue))
+            {
+                Handlers[jobSpecifier].Remove(messageQueue);
+            }
+        }
+
+        public Connection GetConnection()
+        {
+            return new Connection(this);
+        }
+
         public bool IsAlive { get { return Protocol.IsAlive(); } }
 
         //******************************
         // Attributes
         //******************************
         private IConnectionProtocol Protocol { get; set; }
+        private Dictionary<byte, List<Queue<Message>>> Handlers { get; set; }
     }
 }

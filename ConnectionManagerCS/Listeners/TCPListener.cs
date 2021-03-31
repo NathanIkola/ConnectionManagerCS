@@ -14,7 +14,7 @@ namespace ConnectionManagerCS.Listeners
     {
         private TCPListener()
         {
-            Clients = new List<ConnectionManager>();
+            Clients = new List<Connection>();
             Listening = false;
             Task.Run(() => { CullClients(); });
         }
@@ -56,19 +56,21 @@ namespace ConnectionManagerCS.Listeners
                 TcpClient client = Server.AcceptTcpClient();
                 IConnectionProtocol protocol = new TCPConnectionProtocol(client);
                 ConnectionManager manager = new ConnectionManager(protocol);
-                Clients.Add(manager);
+                Connection connection = manager.GetConnection();
+                connection.SubscribeToAll();
+                Clients.Add(connection);
             }
             Server.Stop();
         }
 
         private void CullClients()
         {
-            Clients.RemoveAll(x => x.IsAlive == false);
+            Clients.RemoveAll(x => !x.Manager.IsAlive);
             Thread.Sleep(1000);
         }
 
         private TcpListener Server { get; set; }
-        public List<ConnectionManager> Clients { get; private set; }
+        public List<Connection> Clients { get; private set; }
         private bool Listening { get; set; }
     }
 }

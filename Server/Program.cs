@@ -13,14 +13,25 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            TCPListener listener = new TCPListener(3000);
+            // begin listening for clients
+            IListener listener = new TCPListener(3000);
             listener.Start();
+
+            // give the client time to connect
             Thread.Sleep(500);
-            foreach(ConnectionManager manager in listener.Clients)
+
+            // read from all connected clients
+            foreach(Connection client in listener.Clients)
             {
-                Message msg = manager.ReadMessage();
-                Console.WriteLine(String.Format("Message read with Job Specifier {0}, Transaction ID {1}", msg.JobSpecifier, msg.TransactionID));
+                while(client.PendingMessages > 0)
+                {
+                    Message msg = client.ReadMessage();
+                    Console.WriteLine(
+                        String.Format("Message read with Job Specifier {0}, Transaction ID {1}",
+                                        msg.JobSpecifier, msg.TransactionID));
+                }
             }
+
             Console.WriteLine("Done");
         }
     }

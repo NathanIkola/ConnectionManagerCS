@@ -11,6 +11,6 @@ namespace ConnectionManagerCS.Listeners
     {
         void Start();
         void Stop();
-        List<ConnectionManager> Clients { get; }
+        List<Connection> Clients { get; }
     }
 }
