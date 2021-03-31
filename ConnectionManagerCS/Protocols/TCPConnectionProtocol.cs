@@ -33,7 +33,7 @@ namespace ConnectionManager.Protocols
             Client.Connect(address, port);
         }
 
-        public byte[] ReadMessage(int messageLength)
+        public byte[] ReadBytes(int messageLength)
         {
             if (!NetworkStream.CanRead) throw new ConnectionNotReadyException("NetworkStream unable to read");
             int networkQueueSize = Client.Available;
@@ -46,7 +46,7 @@ namespace ConnectionManager.Protocols
             return messageBytes;
         }
 
-        public void WriteMessage(byte[] messageBytes)
+        public void WriteBytes(byte[] messageBytes)
         {
             throw new NotImplementedException();
         }

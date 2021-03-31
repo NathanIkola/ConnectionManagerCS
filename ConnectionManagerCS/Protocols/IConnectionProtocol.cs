@@ -13,7 +13,7 @@ namespace ConnectionManager.Protocols
 {
     public interface IConnectionProtocol
     {
-        void WriteMessage(byte[] messageBytes);
-        byte[] ReadMessage(int messageLength);
+        void WriteBytes(byte[] messageBytes);
+        byte[] ReadBytes(int messageLength);
     }
 }
