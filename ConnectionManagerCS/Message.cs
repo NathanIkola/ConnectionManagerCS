@@ -12,9 +12,9 @@
 using System;
 using System.Net;
 using System.Runtime.InteropServices;
-using ConnectionManager.Exceptions;
+using ConnectionManagerCS.Exceptions;
 
-namespace ConnectionManager
+namespace ConnectionManagerCS
 {
     public class Message
     {
@@ -22,7 +22,10 @@ namespace ConnectionManager
         {
             JobSpecifier = jobSpecifier;
             TransactionID = transactionID;
-            Payload = payload;
+            if (payload != null)
+                Payload = payload;
+            else
+                Payload = new byte[0];
         }
 
         public Message(byte[] payload) : this(0, 0, payload) { }
@@ -38,7 +41,7 @@ namespace ConnectionManager
 
             // the first byte of the payload size is the transaction ID
             payloadSize += (uint)(TransactionID << 24);
-            payloadSize = (uint)IPAddress.HostToNetworkOrder(payloadSize);
+            payloadSize = (uint)IPAddress.HostToNetworkOrder((int)payloadSize);
 
             byte[] payloadSizeBytes = BitConverter.GetBytes(payloadSize);
             payloadSizeBytes.CopyTo(messageBytes, 1);
@@ -57,7 +60,7 @@ namespace ConnectionManager
             byte jobSpecifier = networkMsgBytes[0];
 
             uint payloadSize = BitConverter.ToUInt32(networkMsgBytes, 1);
-            payloadSize = (uint)IPAddress.NetworkToHostOrder(payloadSize);
+            payloadSize = (uint)IPAddress.NetworkToHostOrder((int)payloadSize);
 
             byte transactionID = (byte)(payloadSize >> 24);
             payloadSize = payloadSize & ~(0xFF << 24);
@@ -67,8 +70,8 @@ namespace ConnectionManager
                     networkMsgBytes.Length, payloadSize+5));
 
             byte[] payload = new byte[payloadSize];
-            for (int i = 5; i < payloadSize; ++i)
-                payload[i - 5] = networkMsgBytes[i];
+            for (int i = 0; i < payloadSize; ++i)
+                payload[i] = networkMsgBytes[i + 5];
 
             return new Message(jobSpecifier, transactionID, payload);
         }

@@ -12,15 +12,14 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using ConnectionManager.Protocols;
+using ConnectionManagerCS.Protocols;
 
-namespace ConnectionManager
+namespace ConnectionManagerCS
 {
     public class ConnectionManager
     {
         public ConnectionManager(IConnectionProtocol protocol)
         {
-            Fragment = new byte[0];
             if (protocol == null) throw new ArgumentNullException();
             Protocol = protocol;
         }
@@ -48,10 +47,11 @@ namespace ConnectionManager
             Protocol.WriteBytes(msgBytes);
         }
 
+        public bool IsAlive { get { return Protocol.IsAlive(); } }
+
         //******************************
         // Attributes
         //******************************
         private IConnectionProtocol Protocol { get; set; }
-        private byte[] Fragment { get; set; }
     }
 }

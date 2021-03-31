@@ -12,9 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using ConnectionManager.Exceptions;
+using ConnectionManagerCS.Exceptions;
 
-namespace ConnectionManager.Protocols
+namespace ConnectionManagerCS.Protocols
 {
     public class TCPConnectionProtocol : IConnectionProtocol
     {
@@ -33,12 +33,15 @@ namespace ConnectionManager.Protocols
             Client.Connect(address, port);
         }
 
+        public TCPConnectionProtocol(TcpClient client)
+        {
+            Client = client;
+        }
+
         public byte[] ReadBytes(int messageLength)
         {
+            if (messageLength == 0) return new byte[0];
             if (!NetworkStream.CanRead) throw new ConnectionNotReadyException("NetworkStream unable to read");
-            int networkQueueSize = Client.Available;
-            if (networkQueueSize == 0) return null;
-            if (messageLength > networkQueueSize) messageLength = networkQueueSize;
 
             byte[] messageBytes = new byte[messageLength];
             int bytesRead = NetworkStream.Read(messageBytes, 0, messageLength);
@@ -48,7 +51,13 @@ namespace ConnectionManager.Protocols
 
         public void WriteBytes(byte[] messageBytes)
         {
-            throw new NotImplementedException();
+            if (!NetworkStream.CanWrite) throw new ConnectionNotReadyException("Network stream unable to write");
+            NetworkStream.Write(messageBytes, 0, messageBytes.Length);
+        }
+
+        public bool IsAlive()
+        {
+            return Client.Connected;
         }
 
         private TcpClient Client { get; set; }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectionManager.Exceptions
+namespace ConnectionManagerCS.Exceptions
 {
     public class ConnectionNotReadyException : Exception
     {
