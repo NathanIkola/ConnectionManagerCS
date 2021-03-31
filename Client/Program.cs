@@ -14,19 +14,12 @@ namespace Client
         static void Main(string[] args)
         {
             // connect to the server via TCP
-            IConnectionProtocol protocol = new TCPConnectionProtocol("localhost", 3000);
+            IConnectionProtocol protocol = new TCPConnectionProtocol("badrats.show", 3000);
             ConnectionManager manager = new ConnectionManager(protocol);
 
             // send a message to the server with job code 5, and transaction ID of 2
-            Message msg = new Message(5, 2, null);
-            manager.WriteMessage(msg);
-
-            // send a message to the server with job code 5, and transaction ID of 2
-            msg = new Message(4, 2, null);
-            manager.WriteMessage(msg);
-
-            // send a message to the server with job code 5, and transaction ID of 2
-            msg = new Message(3, 99, null);
+            byte[] payload = new byte[Message.MaxPayloadSize];
+            Message msg = new Message(3, 99, payload);
             manager.WriteMessage(msg);
 
             // give the server time to read the data before closing the connection

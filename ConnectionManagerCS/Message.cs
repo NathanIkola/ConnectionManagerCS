@@ -94,7 +94,7 @@ namespace ConnectionManagerCS
             } 
         }
 
-        public uint MaxPayloadSize { get { return (1 << 24) - 1; } }
+        public static uint MaxPayloadSize { get { return (1 << 24) - 1; } }
 
         public uint MessageSize
         {

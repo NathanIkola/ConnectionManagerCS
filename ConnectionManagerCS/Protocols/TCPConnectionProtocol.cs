@@ -44,8 +44,13 @@ namespace ConnectionManagerCS.Protocols
             if (!NetworkStream.CanRead) throw new ConnectionNotReadyException("NetworkStream unable to read");
 
             byte[] messageBytes = new byte[messageLength];
-            int bytesRead = NetworkStream.Read(messageBytes, 0, messageLength);
-            if (bytesRead <= 0) throw new Exception("Failed to read data from the stream");
+            int bytesRead = 0;
+            while (bytesRead != messageLength)
+            {
+                bytesRead += NetworkStream.Read(messageBytes, bytesRead, messageLength - bytesRead);
+            }
+
+            if (bytesRead != messageLength) throw new Exception("Failed to read data from the stream");
             return messageBytes;
         }
 

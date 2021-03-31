@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ConnectionManagerCS;
 using ConnectionManagerCS.Listeners;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Server
 {
@@ -18,7 +19,14 @@ namespace Server
             listener.Start();
 
             // give the client time to connect
-            Thread.Sleep(500);
+            while (listener.Clients.Count == 0) { }
+
+            // start tracking time
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            // wait for the client to get a message to us
+            while (listener.Clients[0].PendingMessages == 0) { }
 
             // read from all connected clients
             foreach(Connection client in listener.Clients)
@@ -27,12 +35,15 @@ namespace Server
                 {
                     Message msg = client.ReadMessage();
                     Console.WriteLine(
-                        String.Format("Message read with Job Specifier {0}, Transaction ID {1}",
-                                        msg.JobSpecifier, msg.TransactionID));
+                        String.Format("Message read with Job Specifier {0}, Transaction ID {1}, payload size {2}",
+                                        msg.JobSpecifier, msg.TransactionID, msg.PayloadSize));
                 }
             }
+            stopwatch.Stop();
+            Console.WriteLine(String.Format("{0}ms elapsed", stopwatch.ElapsedMilliseconds));
 
             Console.WriteLine("Done");
+            Thread.Sleep(10000);
         }
     }
 }
