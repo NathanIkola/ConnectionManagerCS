@@ -22,6 +22,9 @@ namespace ConnectionManagerCS.Protocols
                 throw new ArgumentNullException("IPEndPoint was null");
             IPEndPoint = ipEndPoint;
             Client = new UdpClient();
+            Client.Client.ReceiveBufferSize = (int)Message.MaxPayloadSize + 5;
+            Client.Client.SendBufferSize = (int)Message.MaxPayloadSize + 5;
+            Client.Client.Bind(IPEndPoint);
         }
 
         public UDPConnectionProtocol(IPEndPoint ipEndPoint, string hostName, int port) : this(ipEndPoint)
@@ -58,6 +61,7 @@ namespace ConnectionManagerCS.Protocols
             {
                 IPEndPoint ip = IPEndPoint;
                 Fragment = Client.Receive(ref ip);
+                if (Fragment.Length == 0) return new byte[0];
             }
 
             if (messageLength > Fragment.Length)
@@ -68,13 +72,19 @@ namespace ConnectionManagerCS.Protocols
                 messageBytes[_byte] = Fragment[_byte];
             for (int _byte = 0; _byte < Fragment.Length - messageLength; ++_byte)
                 newFragment[_byte] = Fragment[_byte + messageLength];
-            Fragment = newFragment;
+
+            if (newFragment.Length != 0)
+                Fragment = newFragment;
+            else
+                Fragment = null;
 
             return messageBytes;
         }
 
         public void WriteBytes(byte[] messageBytes)
         {
+            if (messageBytes.Length > MaxSupportedSize)
+                throw new ArgumentOutOfRangeException("Message too large to send reliably on datagram");
             Client.Send(messageBytes, messageBytes.Length);
         }
 
@@ -84,6 +94,7 @@ namespace ConnectionManagerCS.Protocols
             return true;
         }
 
+        public int MaxSupportedSize { get { return 65507; } }
         private UdpClient Client { get; set; }
         private IPEndPoint IPEndPoint { get; set; }
         private byte[] Fragment { get; set; }

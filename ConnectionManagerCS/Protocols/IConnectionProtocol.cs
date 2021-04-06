@@ -14,5 +14,6 @@ namespace ConnectionManagerCS.Protocols
         void WriteBytes(byte[] messageBytes);
         byte[] ReadBytes(int messageLength);
         bool IsAlive();
+        int MaxSupportedSize { get; }
     }
 }

@@ -15,21 +15,19 @@ namespace Server
         static void Main(string[] args)
         {
             // begin listening for clients
-            IListener listener = new TCPListener(3000);
+            //IListener listener = new TCPListener(3000);
+            UDPListener listener = new UDPListener(3000);
             listener.Start();
 
-            // give the client time to connect
-            while (listener.Clients.Count == 0) { }
+            // wait for the client to get a message to us
+            while (listener.Clients[0].PendingMessages == 0) { }
 
             // start tracking time
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // wait for the client to get a message to us
-            while (listener.Clients[0].PendingMessages == 0) { }
-
             // read from all connected clients
-            foreach(Connection client in listener.Clients)
+            foreach (Connection client in listener.Clients)
             {
                 while(client.PendingMessages > 0)
                 {

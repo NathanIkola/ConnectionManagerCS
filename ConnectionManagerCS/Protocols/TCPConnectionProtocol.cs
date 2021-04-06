@@ -74,6 +74,8 @@ namespace ConnectionManagerCS.Protocols
             return Client.Connected;
         }
 
+        public int MaxSupportedSize { get { return (int)Message.MaxPayloadSize + 5; } }
+
         private TcpClient Client { get; set; }
         private NetworkStream NetworkStream { get { return Client.GetStream(); } }
     }

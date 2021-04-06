@@ -13,12 +13,7 @@
 // nathan.ikola@gmail.com
 //************************************************
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ConnectionManagerCS.Listeners;
 
 namespace ConnectionManagerCS.Protocols
 {
@@ -44,6 +39,7 @@ namespace ConnectionManagerCS.Protocols
             return true;
         }
 
+        public int MaxSupportedSize { get { return (int)Message.MaxPayloadSize + 5; } }
 
         private Queue<byte[]> Messages { get; set; }
     }

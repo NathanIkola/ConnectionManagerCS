@@ -8,6 +8,7 @@ using ConnectionManagerCS.Protocols;
 using System.Threading;
 using ConnectionManagerCS.Listeners;
 using System.Diagnostics;
+using System.Net;
 
 namespace Client
 {
@@ -18,11 +19,15 @@ namespace Client
             // connect to the server via TCP
             IListener listener = new TCPListener(3000);
             listener.Start();
-            IConnectionProtocol protocol = new TCPConnectionProtocol("localhost", 3000);
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
+            IConnectionProtocol protocol = new UDPConnectionProtocol(endPoint, "localhost", 3000);
+            //IConnectionProtocol protocol = new TCPConnectionProtocol("localhost", 3000);
             ConnectionManager manager = new ConnectionManager(protocol);
 
+            Thread.Sleep(1500);
+
             // send a message to the server with job code 5, and transaction ID of 2
-            byte[] payload = new byte[Message.MaxPayloadSize];
+            byte[] payload = new byte[protocol.MaxSupportedSize-5];
             // start tracking time
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();

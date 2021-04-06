@@ -34,16 +34,22 @@ namespace ConnectionManagerCS.Listeners
         {
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
             Protocol = new UDPConnectionProtocol(endPoint);
+            ConnectionManager man = new ConnectionManager(Protocol);
+            Clients.Add(man.GetConnection());
         }
 
         public UDPListener(IPEndPoint endPoint) : this()
         {
             Protocol = new UDPConnectionProtocol(endPoint);
+            ConnectionManager man = new ConnectionManager(Protocol);
+            Clients.Add(man.GetConnection());
         }
 
         public UDPListener(IPAddress address, int port) : this()
         {
             Protocol = new UDPConnectionProtocol(new IPEndPoint(address, port));
+            ConnectionManager man = new ConnectionManager(Protocol);
+            Clients.Add(man.GetConnection());
         }
 
         public void Start()
@@ -85,7 +91,7 @@ namespace ConnectionManagerCS.Listeners
             }
         }
 
-        private UDPConnectionProtocol Protocol { get; set; }
+        public UDPConnectionProtocol Protocol { get; private set; }
         public List<Connection> Clients { get; private set; }
         private bool Listening { get; set; }
     }
