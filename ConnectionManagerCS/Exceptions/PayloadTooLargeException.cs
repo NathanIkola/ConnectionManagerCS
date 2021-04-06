@@ -1,8 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//************************************************
+// PayloadTooLargeException.cs
+//
+// Thrown when the payload generated is larger
+// than the allowed size.
+//
+// Author: Nathan Ikola
+// nathan.ikola@gmail.com
+//************************************************
+
+using System;
 
 namespace ConnectionManagerCS.Exceptions
 {

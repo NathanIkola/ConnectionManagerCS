@@ -1,7 +1,18 @@
-﻿using System;
+﻿//************************************************
+// TCPListener.cs
+//
+// Listens for incoming TCP connections and
+// generates a ConnectionManager and subsequent
+// Connection for that client, and adds it to the
+// list of currently connected clients. 
+// Responsible for managing the living connections
+// to a server.
+//
+// Author: Nathan Ikola
+// nathan.ikola@gmail.com
+//************************************************
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;

@@ -7,8 +7,6 @@
 // nathan.ikola@gmail.com
 //************************************************
 
-using ConnectionManagerCS;
-
 namespace ConnectionManagerCS.Protocols
 {
     public interface IConnectionProtocol

@@ -1,5 +1,5 @@
 ﻿//************************************************
-// ConMan.cs
+// ConnectionManager.cs
 //
 // The class responsible for managing a single
 // connection between two computers over a single

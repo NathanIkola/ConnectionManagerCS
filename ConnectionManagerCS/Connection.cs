@@ -1,4 +1,17 @@
-﻿using System;
+﻿//************************************************
+// Connection.cs
+//
+// A logical connection between two machines. In
+// reality it is simply a conduit by which the
+// ConnectionManager that spawned it is able to
+// pass network traffic around to parts of the
+// application.
+//
+// Author: Nathan Ikola
+// nathan.ikola@gmail.com
+//************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

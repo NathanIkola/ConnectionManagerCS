@@ -1,4 +1,19 @@
-﻿using System;
+﻿//************************************************
+// LocalConnectionProtocol.cs
+//
+// Simply echoes bytes written with WriteBytes to
+// bytes read with ReadBytes. Used by an 
+// application to communicate to itself locally as
+// if it were over the network. Useful for mocking
+// network traffic and for creating modules that
+// are agnostic to servers hosted locally and
+// remotely.
+//
+// Author: Nathan Ikola
+// nathan.ikola@gmail.com
+//************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

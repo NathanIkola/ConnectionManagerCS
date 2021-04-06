@@ -1,9 +1,13 @@
-﻿using System;
+﻿//************************************************
+// IListener.cs
+//
+// Interface for all listeners
+//
+// Author: Nathan Ikola
+// nathan.ikola@gmail.com
+//************************************************
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ConnectionManagerCS.Protocols;
 
 namespace ConnectionManagerCS.Listeners
 {
