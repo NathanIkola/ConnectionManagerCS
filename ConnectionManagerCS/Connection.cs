@@ -13,9 +13,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConnectionManagerCS
 {
@@ -43,6 +40,13 @@ namespace ConnectionManagerCS
         {
             for (int jobSpecifier = 0; jobSpecifier < 256; ++jobSpecifier)
                 Subscribe((byte)jobSpecifier);
+        }
+
+        public void PassMessage(Message message)
+        {
+            if (message == null)
+                throw new ArgumentNullException("Message was null");
+            MessageQueue.Enqueue(message);
         }
 
         public void Subscribe(byte jobSpecifier)

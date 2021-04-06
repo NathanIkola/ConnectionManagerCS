@@ -76,8 +76,11 @@ namespace ConnectionManagerCS.Listeners
 
         private void CullClients()
         {
-            Clients.RemoveAll(x => !x.Manager.IsAlive);
-            Thread.Sleep(1000);
+            while(true)
+            {
+                Clients.RemoveAll(x => !x.Manager.IsAlive);
+                Thread.Sleep(1000);
+            }
         }
 
         private TcpListener Server { get; set; }
