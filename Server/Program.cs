@@ -15,11 +15,12 @@ namespace Server
         static void Main(string[] args)
         {
             // begin listening for clients
-            //IListener listener = new TCPListener(3000);
-            UDPListener listener = new UDPListener(3000);
+            IListener listener = new TCPListener(3000);
+            //IListener listener = new UDPListener(3000);
             listener.Start();
 
             // wait for the client to get a message to us
+            while (listener.Clients.Count == 0) { }
             while (listener.Clients[0].PendingMessages == 0) { }
 
             // start tracking time

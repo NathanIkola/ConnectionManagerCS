@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using ConnectionManagerCS.Protocols;
@@ -33,7 +34,16 @@ namespace ConnectionManagerCS
         {
             while(true)
             {
-                Message msg = ReadMessage();
+                Message msg;
+                try
+                {
+                    msg = ReadMessage();
+                }
+                catch(IOException)
+                {
+                    break;
+                }
+
                 if(Handlers.ContainsKey(msg.JobSpecifier))
                 {
                     foreach (Queue<Message> messageQueue in Handlers[msg.JobSpecifier])
