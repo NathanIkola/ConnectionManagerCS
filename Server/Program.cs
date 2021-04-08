@@ -12,37 +12,63 @@ namespace Server
 {
     class Program
     {
+        const int SUBSCRIBE = 100;
+        const int UNSUBSCRIBE = 101;
         static void Main(string[] args)
         {
             // begin listening for clients
             IListener listener = new TCPListener(3000);
-            //IListener listener = new UDPListener(3000);
             listener.Start();
 
-            // wait for the client to get a message to us
-            while (listener.Clients.Count == 0) { }
-            while (listener.Clients[0].PendingMessages == 0) { }
-
-            // start tracking time
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            // read from all connected clients
-            foreach (Connection client in listener.Clients)
+            while(true)
             {
-                while(client.PendingMessages > 0)
+                // listen for messages coming from the connected clients
+                foreach(Connection conn in listener.Clients)
                 {
-                    Message msg = client.ReadMessage();
-                    Console.WriteLine(
-                        String.Format("Message read with Job Specifier {0}, Transaction ID {1}, payload size {2}",
-                                        msg.JobSpecifier, msg.TransactionID, msg.PayloadSize));
+                    // process all messages they have (if any at all)
+                    while(conn.PendingMessages > 0)
+                    {
+                        Dispatch(conn.ReadMessage(), conn);
+                    }
                 }
             }
-            stopwatch.Stop();
-            Console.WriteLine(String.Format("{0}ms elapsed", stopwatch.ElapsedMilliseconds));
-
-            Console.WriteLine("Done");
-            Thread.Sleep(10000);
         }
+
+        static void Dispatch(Message msg, Connection conn)
+        {
+            switch(msg.JobSpecifier)
+            {
+                case SUBSCRIBE:
+                    {
+                        // even
+                        if (msg.Payload == null || msg.Payload[0] == 0)
+                            EvenSubscribers.Add(conn);
+                        else
+                            OddSubscribers.Add(conn);
+                        break;
+                    }
+                case UNSUBSCRIBE:
+                    {
+                        // even
+                        if (msg.Payload == null || msg.Payload[0] == 0)
+                            EvenSubscribers.Remove(conn);
+                        else
+                            OddSubscribers.Remove(conn);
+                        break;
+                    }
+                default:
+                    {
+                        // even
+                        if (msg.JobSpecifier % 2 == 0)
+                            foreach (Connection c in EvenSubscribers) c.WriteMessage(msg);
+                        else
+                            foreach (Connection c in OddSubscribers) c.WriteMessage(msg);
+                        break;
+                    }
+            }
+        }
+
+        static List<Connection> EvenSubscribers = new List<Connection>();
+        static List<Connection> OddSubscribers = new List<Connection>();
     }
 }

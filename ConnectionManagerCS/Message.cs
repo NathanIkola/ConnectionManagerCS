@@ -28,6 +28,12 @@ namespace ConnectionManagerCS
                 Payload = new byte[0];
         }
 
+        public Message(byte jobSpecifier, byte[] payload) : this(jobSpecifier, 0, payload)
+        {
+            Random rand = new Random();
+            TransactionID = (byte)rand.Next(0, 255);
+        }
+
         public Message(byte[] payload) : this(0, 0, payload) { }
 
         public byte[] GetNetworkBytes()

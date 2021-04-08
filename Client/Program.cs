@@ -14,21 +14,50 @@ namespace Client
 {
     class Program
     {
+        const int SUBSCRIBE = 100;
+        const int UNSUBSCRIBE = 101;
+
         static void Main(string[] args)
         {
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
-            //IConnectionProtocol protocol = new UDPConnectionProtocol(endPoint, "localhost", 3000);
+            // establish a connection to the remote application
             IConnectionProtocol protocol = new TCPConnectionProtocol("localhost", 3000);
             ConnectionManager manager = new ConnectionManager(protocol);
+            Connection conn = manager.GetConnection();
 
-            // send a message to the server with job code 5, and transaction ID of 2
-            byte[] payload = new byte[protocol.MaxSupportedSize-5];
+            // we want all messages that come our way
+            conn.SubscribeToAll();
 
-            Message msg = new Message(3, 99, payload);
-            manager.WriteMessage(msg);
+            // start out tracking evens
+            byte mode = 0;
+            Message m = new Message(SUBSCRIBE, new byte[] { mode });
+            conn.WriteMessage(m);
 
-            // give the server time to read the data before closing the connection
-            Thread.Sleep(3000);
+            while(true)
+            {
+                // if there are no messages waiting to be read then poll for input
+                while(conn.PendingMessages == 0)
+                {
+                    if(Console.KeyAvailable && Console.ReadKey().Key == ConsoleKey.Spacebar)
+                    {
+                        // unsubscribe from current
+                        byte[] payload = { mode };
+                        m = new Message(UNSUBSCRIBE, payload);
+                        conn.WriteMessage(m);
+
+                        // subscribe to other
+                        if (mode == 0) mode = 1;
+                        else mode = 0;
+
+                        payload[0] = mode;
+                        m = new Message(SUBSCRIBE, payload);
+                        conn.WriteMessage(m);
+                    }
+                }
+
+                // display the contents of the received message
+                m = conn.ReadMessage();
+                Console.WriteLine(String.Format("Received message with job specifier of {0}", m.JobSpecifier));
+            }
         }
     }
 }

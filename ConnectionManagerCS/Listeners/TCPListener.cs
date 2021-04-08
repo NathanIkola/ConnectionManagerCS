@@ -25,7 +25,7 @@ namespace ConnectionManagerCS.Listeners
     {
         private TCPListener()
         {
-            Clients = new List<Connection>();
+            Connections = new List<Connection>();
             Listening = false;
             Task.Run(() => { CullClients(); });
         }
@@ -69,7 +69,7 @@ namespace ConnectionManagerCS.Listeners
                 ConnectionManager manager = new ConnectionManager(protocol);
                 Connection connection = manager.GetConnection();
                 connection.SubscribeToAll();
-                Clients.Add(connection);
+                Connections.Add(connection);
             }
             Server.Stop();
         }
@@ -78,13 +78,20 @@ namespace ConnectionManagerCS.Listeners
         {
             while(true)
             {
-                Clients.RemoveAll(x => !x.Manager.IsAlive);
+                Connections.RemoveAll(x => !x.Manager.IsAlive);
                 Thread.Sleep(1000);
             }
         }
 
         private TcpListener Server { get; set; }
-        public List<Connection> Clients { get; private set; }
+        private List<Connection> Connections { get; set; }
+        public Connection[] Clients 
+        { 
+            get
+            {
+                return Connections.ToArray();
+            }
+        }
         private bool Listening { get; set; }
     }
 }
